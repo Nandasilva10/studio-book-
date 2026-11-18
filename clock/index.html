@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Relógio do Brasil</title>
+<style>
+/* Layout: one big centered digital clock, zone switcher below, date above. */
+:root{--bg:#f4f7f2;--fg:#0b2a1a;--muted:#4f6b5b;--accent:#009c3b;--sun:#c99a00;--line:#cfdccf;
+--display:"Space Grotesk",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#07160e;--fg:#e8f5ec;--muted:#8fb09c;--accent:#2fd36b;--sun:#ffdf00;--line:#1f3a2b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#07160e;--fg:#e8f5ec;--muted:#8fb09c;--accent:#2fd36b;--sun:#ffdf00;--line:#1f3a2b;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--display);padding-block:8vh;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));min-height:100vh;box-sizing:border-box}
+main{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:28px;align-items:center;text-align:center}
+.date{font-size:clamp(15px,3.5vw,20px);color:var(--muted);text-transform:capitalize;letter-spacing:.02em}
+.time{font-family:var(--mono);font-weight:700;font-size:clamp(48px,16vw,150px);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.03em;display:flex;align-items:baseline;gap:.05em}
+.time .s{color:var(--accent)}
+.time .sep{color:var(--sun);animation:b 1s steps(1) infinite}
+@keyframes b{50%{opacity:.25}}
+.zone{font-size:15px;color:var(--muted)}
+.zone b{color:var(--fg);font-weight:600}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+button{font:inherit;font-size:14px;color:var(--fg);background:transparent;border:1px solid var(--line);padding:8px 14px;border-radius:6px;cursor:pointer}
+button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#04140a}
+button:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.time .sep{animation:none}}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Space+Grotesk:wght@400;600&display=swap">
+<body style="margin:0">
+<main>
+  <div class="date" id="date">&nbsp;</div>
+  <div class="time" id="time" aria-live="off"><span id="h">--</span><span class="sep">:</span><span id="m">--</span><span class="sep">:</span><span class="s" id="s">--</span></div>
+  <div class="zone" id="zone">&nbsp;</div>
+</main>
+<script>
+var ZONE="America/Sao_Paulo";
+function render(){
+  var now=new Date();
+  var p={};new Intl.DateTimeFormat("pt-BR",{timeZone:ZONE,hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}).formatToParts(now).forEach(function(x){p[x.type]=x.value});
+  document.getElementById("h").textContent=p.hour==="24"?"00":p.hour;
+  document.getElementById("m").textContent=p.minute;
+  document.getElementById("s").textContent=p.second;
+  document.getElementById("date").textContent=new Intl.DateTimeFormat("pt-BR",{timeZone:ZONE,weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(now);
+  document.getElementById("zone").textContent="São Paulo";
+}
+render();
+(function tick(){render();setTimeout(tick,1000-Date.now()%1000)})();
+</script>
+</body>
+</html>
